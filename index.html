@@ -23,11 +23,6 @@
 			<footer class="footer">
 				<!-- This should be `0 items left` by default -->
 				<span class="todo-count"><strong>0</strong> items left</span>
-				<script>
-					function updateCount (count) {
-						document.querySelector('.todo-count strong').innerText = count;
-					}
-				</script>
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
 					<li>
@@ -41,7 +36,7 @@
 					</li>
 				</ul>
 				<!-- Hidden if no completed items are left ↓ -->
-				<button class="clear-completed">Clear completed</button>
+				<button class="clear-completed" type="button">Clear completed</button>
 			</footer>
 		</section>
 		<footer class="info">
@@ -49,7 +44,8 @@
 			<!-- Remove the below line ↓ -->
 			<p>Template by <a href="http://sindresorhus.com">Sindre Sorhus</a></p>
 			<!-- Change this out with your name and url ↓ -->
-			<p>Created by <a href="http://todomvc.com">Marc Grabanski</a></p>
+			<p>Forked from  <a href="https://github.com/1Marc/todomvc-vanillajs-2022">Marc Grabanski</a></p>
+			<p>Build by <a href="https://github.com/1Marc/todomvc-vanillajs-2022">HipsterBrown</a></p>
 			<p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
 		</footer>
 		<!-- Scripts here. Don't remove ↓ -->

@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "python3 -m http.server 1337"
+    "start": "npx serve ."
   },
   "dependencies": {
     "todomvc-app-css": "^2.0.0",
