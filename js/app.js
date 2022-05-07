@@ -1,7 +1,8 @@
-import { addEvent, escapeForHTML, getURLHash } from "./helpers.js";
+import { getURLHash } from "./helpers.js";
 import { TodoStore } from "./store.js";
+import "./todo-item.js";
 
-class App {
+class App extends HTMLElement {
 	$ = {
 		input: document.querySelector(".new-todo"),
 		list: document.querySelector(".todo-list"),
@@ -15,7 +16,16 @@ class App {
 	filter = getURLHash();
 
 	constructor() {
+		super();
 		this.store = new TodoStore("todo-vanillajs-2022");
+	}
+
+	connectedCallback() {
+		this.#attachListeners();
+		this.render();
+	}
+
+	#attachListeners() {
 		this.store.addEventListener("save", this.render.bind(this));
 		window.addEventListener("hashchange", () => {
 			this.filter = getURLHash();
@@ -33,60 +43,28 @@ class App {
 		this.$.clear.addEventListener("click", () => {
 			this.store.clearCompleted();
 		});
-		this.render();
+		this.$.list.addEventListener("destroy", (event) => {
+			this.store.remove(event.detail);
+		});
+		this.$.list.addEventListener("update", (event) => {
+			this.store.update(event.detail);
+		});
+		this.$.list.addEventListener("toggle", (event) => {
+			this.store.toggle(event.detail);
+		});
 	}
 
 	addTodo(todo) {
 		this.store.add({ title: todo, completed: false, id: `id_${Date.now()}` });
 	}
 
-	removeTodo(todo) {
-		this.store.remove(todo);
-	}
-
-	toggleTodo(todo) {
-		this.store.toggle(todo);
-	}
-
-	editingTodo(_todo, li) {
-		li.classList.add("editing");
-		li.querySelector(".edit").focus();
-	}
-
-	updateTodo(todo, li) {
-		this.store.update(todo);
-		li.querySelector(".edit").value = todo.title;
-	}
-
 	createTodoItem(todo) {
-		const li = document.createElement("li");
-		if (todo.completed) {
-			li.classList.add("completed");
-		}
+		const todoItem = document.createElement("todo-item");
+		todoItem.completed = todo.completed;
+		todoItem.title = todo.title;
+		todoItem.id = todo.id;
 
-		li.innerHTML = `
-      <div class="view">
-        <input class="toggle" type="checkbox" ${
-					todo.completed ? "checked" : ""
-				}>
-        <label>${escapeForHTML(todo.title)}</label>
-        <button class="destroy" aria-label="remove todo"></button>
-      </div>
-      <input class="edit" value="${escapeForHTML(todo.title)}">
-    `;
-
-		addEvent(li, ".destroy", "click", () => this.removeTodo(todo, li));
-		addEvent(li, ".toggle", "click", () => this.toggleTodo(todo, li));
-		addEvent(li, "label", "dblclick", () => this.editingTodo(todo, li));
-		addEvent(li, ".edit", "keyup", (event) => {
-			if (event.key === "Enter")
-				this.updateTodo({ ...todo, title: event.target.value }, li);
-		});
-		addEvent(li, ".edit", "blur", (event) =>
-			this.updateTodo({ ...todo, title: event.target.value }, li)
-		);
-
-		return li;
+		return todoItem;
 	}
 
 	render() {
@@ -109,5 +87,5 @@ class App {
 	}
 }
 
-new App();
+customElements.define("todo-app", App);
 
