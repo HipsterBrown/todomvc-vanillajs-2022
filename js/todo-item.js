@@ -1,3 +1,4 @@
+import { DestroyEvent, ToggleEvent, UpdateEvent } from "./events.js";
 import { escapeForHTML } from "./helpers.js";
 
 const template = document.createElement("template");
@@ -116,90 +117,78 @@ template.innerHTML = `
 `;
 
 export class TodoItem extends HTMLElement {
-	constructor() {
-		super();
-		this.attachShadow({ mode: "open" });
-	}
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
 
-	title = "";
-	completed = false;
+  title = "";
+  completed = false;
 
-	connectedCallback() {
-		this.role = "list-item";
+  connectedCallback() {
+    this.role = "list-item";
 
-		this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-		this.shadowRoot
-			.querySelector(".destroy")
-			.addEventListener("click", () => this.remove());
-		this.shadowRoot
-			.querySelector(".toggle")
-			.addEventListener("click", () => this.toggle());
-		this.shadowRoot
-			.querySelector("label")
-			.addEventListener("dblclick", () => this.editing());
-		this.shadowRoot
-			.querySelector(".edit")
-			.addEventListener("keyup", (event) => {
-				if (event.key === "Enter") this.update(event.target.value);
-			});
-		this.shadowRoot.querySelector(".edit").addEventListener("blur", (event) => {
-			this.update(event.target.value);
-		});
+    this.shadowRoot
+      .querySelector(".destroy")
+      .addEventListener("click", () => this.remove());
+    this.shadowRoot
+      .querySelector(".toggle")
+      .addEventListener("click", () => this.toggle());
+    this.shadowRoot
+      .querySelector("label")
+      .addEventListener("dblclick", () => this.editing());
+    this.shadowRoot
+      .querySelector(".edit")
+      .addEventListener("keyup", (event) => {
+        if (event.key === "Enter") this.update(event.target.value);
+      });
+    this.shadowRoot.querySelector(".edit").addEventListener("blur", (event) => {
+      this.update(event.target.value);
+    });
 
-		this.shadowRoot.querySelector("label").textContent = escapeForHTML(
-			this.title
-		);
-		this.shadowRoot.querySelector(".edit").value = escapeForHTML(this.title);
-		if (this.completed) {
-			this.classList.add("completed");
-			this.shadowRoot.querySelector(".toggle").checked = this.completed;
-		}
-	}
+    this.shadowRoot.querySelector("label").textContent = escapeForHTML(
+      this.title
+    );
+    this.shadowRoot.querySelector(".edit").value = escapeForHTML(this.title);
+    if (this.completed) {
+      this.classList.add("completed");
+      this.shadowRoot.querySelector(".toggle").checked = this.completed;
+    }
+  }
 
-	remove() {
-		this.dispatchEvent(
-			new CustomEvent("destroy", {
-				bubbles: true,
-				detail: this.todo,
-			})
-		);
-	}
+  remove() {
+    this.dispatchEvent(
+      new DestroyEvent(this.todo)
+    );
+  }
 
-	toggle() {
-		this.dispatchEvent(
-			new CustomEvent("toggle", {
-				bubbles: true,
-				detail: this.todo,
-			})
-		);
-	}
+  toggle() {
+    this.dispatchEvent(
+      new ToggleEvent(this.todo)
+    );
+  }
 
-	editing() {
-		this.classList.add("editing");
-		this.shadowRoot.querySelector(".edit").focus();
-	}
+  editing() {
+    this.classList.add("editing");
+    this.shadowRoot.querySelector(".edit").focus();
+  }
 
-	update(value) {
-		this.dispatchEvent(
-			new CustomEvent("toggle", {
-				bubbles: true,
-				detail: {
-					...this.todo,
-					title: value,
-				},
-			})
-		);
-		this.shadowRoot.querySelector(".edit").value = value;
-	}
+  update(value) {
+    this.dispatchEvent(
+      new UpdateEvent({ ...this.todo, title: value })
+    );
+    this.shadowRoot.querySelector(".edit").value = value;
+  }
 
-	get todo() {
-		return {
-			id: this.id,
-			completed: this.completed,
-			title: this.title,
-		};
-	}
+  get todo() {
+    return {
+      id: this.id,
+      completed: this.completed,
+      title: this.title,
+    };
+  }
 }
 
 customElements.define("todo-item", TodoItem);
