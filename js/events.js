@@ -1,21 +1,24 @@
-export class DestroyEvent extends CustomEvent {
+class TodoEvent extends CustomEvent {
+  constructor(name, todo) {
+    if (!todo) throw new Error(`Missing todo in "${name}" event`)
+    super(name, { bubbles: true, detail: todo })
+  }
+}
+export class DestroyEvent extends TodoEvent {
   constructor(todo) {
-    if (!todo) throw new Error('Missing todo in DestroyEvent')
-    super("destroy", { bubbles: true, detail: todo })
+    super("destroy", todo)
   }
 }
 
-export class ToggleEvent extends CustomEvent {
+export class ToggleEvent extends TodoEvent {
   constructor(todo) {
-    if (!todo) throw new Error('Missing todo in ToggleEvent')
-    super('toggle', { bubbles: true, detail: todo })
+    super("toggle", todo)
   }
 }
 
-export class UpdateEvent extends CustomEvent {
+export class UpdateEvent extends TodoEvent {
   constructor(todo) {
-    if (!todo) throw new Error('Missing todo in ToggleEvent')
-    super('update', { bubbles: true, detail: todo })
+    super("update", todo)
   }
 }
 
